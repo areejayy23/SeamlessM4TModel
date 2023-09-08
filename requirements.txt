@@ -17,10 +17,12 @@ dill==0.3.7
 distlib==0.3.7
 fairseq2==0.1.0
 fairseq2n==0.1.0
+ffmpeg-python==0.2.0
 filelock==3.12.3
 Flask==2.3.3
 frozenlist==1.4.0
 fsspec==2023.9.0
+future==0.18.3
 huggingface-hub==0.16.4
 identify==2.5.27
 idna==3.4
@@ -63,6 +65,7 @@ portalocker==2.7.0
 pre-commit==3.4.0
 pyarrow==13.0.0
 pycparser==2.21
+pydub==0.25.1
 python-dateutil==2.8.2
 pytz==2023.3.post1
 PyYAML==6.0.1

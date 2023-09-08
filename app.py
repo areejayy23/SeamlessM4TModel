@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, render_template
 import os, torchaudio, torch
 from seamless_communication.models.inference import Translator
-import platform
+import platform, ffmpeg
+from pydub import AudioSegment
 
 app = Flask(__name__)
 translator = ''
@@ -76,14 +77,12 @@ def validate_audio_file(recordedAudio, selectedAudio, target_language):
     try:
         output_directory = 'static'
         os.makedirs(output_directory, exist_ok=True)
-    
+
         global translator
         if len(str(translator)) == 0:
           translator = Translator("seamlessM4T_large", "vocoder_36langs", torch.device("cpu"), torch.float32)
 
         if(len(str(selectedAudio)) > 0) :
-            print(platform.system())
-
             if platform.system() == "Linux" or platform.system() == "Linux2":
                 path = '/'
             elif platform.system() == "Windows":
@@ -92,9 +91,11 @@ def validate_audio_file(recordedAudio, selectedAudio, target_language):
                 if selectedAudio.filename in files:
                     filePath = str(os.path.join(root, selectedAudio.filename))
         else:
-            filePath = str(os.path.join(output_directory, 'recorded_audio.wav'))
             recordedAudio.save(os.path.join(output_directory, 'recorded_audio.wav'))
-            # waveform, sample_rate = torchaudio.load(filePath)
+            filePath = str(os.path.join(output_directory, 'recorded_audio.wav'))
+            audio = AudioSegment.from_file(filePath)
+            audio = audio.set_frame_rate(16000)
+            audio.export(filePath, format="wav")
 
         print("filePath " + filePath)
 
