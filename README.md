@@ -50,11 +50,13 @@ git clone https://github.com/areejayy23/SpeechTranslator.git
 ├── app.py
 ├── README.md
 ├── requirements.txt
+├── libsndfile.so.1
 └── templates
     └── index.html
 
 ## Copy the Files to Your Flask App
 Copy the repository files to your Flask App
+Copy ** libsndfile.so.1 ** to lib folder in your Flask App
 ## Install the Dependencies
 Now open the code on any IDE or terminal and run the command to install the dependencies
 ```
