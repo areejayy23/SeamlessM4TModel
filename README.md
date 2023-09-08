@@ -44,9 +44,9 @@ pip install Flask
 ```
 git clone https://github.com/areejayy23/SpeechTranslator.git
 ```
-> You can clone it anywhere on your system for now
-> After cloning it, copy the files from the cloned folder to your Flask app folder
-> Following are the files in the repository
+** You can clone it anywhere on your system for now
+** After cloning it, copy the files from the cloned folder to your Flask app folder
+** Following are the files in the repository
 ├── app.py
 ├── README.md
 ├── requirements.txt
@@ -56,6 +56,7 @@ git clone https://github.com/areejayy23/SpeechTranslator.git
 ## Copy the Files to Your Flask App
 Copy the repository files to your Flask App
 ## Install the Dependencies
+Now open the code on any IDE or terminal and run the command to install the dependencies
 ```
 pip install -r requirements.txt
 ```
