@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seamless M4T UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f7fb;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        /* .btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+        } */
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .loader-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+<body>
+    <div class="header">
+        <h3 class="display-7">Speech To Speech Translator</h3>
+    </div>
+    <div class="container">
+        <!-- <h3 class="lead">Translate Your Voice</h3> -->
+        <!-- <br> -->
+        <div class="result"> 
+            <h6 class="card-subtitle mb-2 text-muted">Choose Target Language</h6>
+            <select class="form-control form-control-sm" id="targetLanguage" enabled>
+                <option value="English">English</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Portuguese">Portuguese</option>
+                <!-- Add more language options as needed -->
+            </select>
+        </div>
+        
+        <!-- <br> -->
+
+        <div class="result">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="selectFile" name="inputChoice" value="file" checked>
+                <label for="selectFile">Select Audio File</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="recordAudio" name="inputChoice" value="record">
+                <label for="recordAudio">Record Audio</label>
+            </div>
+    
+            <br>
+            <br>
+    
+            <div>
+                <input class="btn btn-outline-secondary w-100" type="file" id="fileInput" accept=".wav, .mp3">
+                <button hidden = "hidden" class="btn btn-outline-secondary w-25" id="recordButton" disabled>Record</button>
+                <button hidden = "hidden" class="btn btn-outline-secondary w-25" id="stopButton" disabled>Stop</button>
+            </div>
+        </div>
+        
+        <br>
+
+        <button class="btn btn-primary btn-block w-100" id="translateButton" disabled>Translate</button>
+        
+        <div class="result" id="translationResult">
+            <!-- <h5 class="card-title text-muted">Translation Result:</h5> -->
+            <div class=" result form-outline">
+                <p class="card-subtitle mb-2 text-muted">Translated Text</p>
+                <textarea style="font-size:80%" class="form-control" id="translatedText" disabled></textarea>
+            </div>
+            <div class="form-outline result">
+                <p class="card-subtitle mb-2 text-muted">Translated Speech</p>
+                <audio class="w-100" id="outputAudio" controls></audio>
+            </div>
+        </div>
+    </div>
+
+    <div class="loader-container" id="loaderContainer">
+        <div class="loader"></div>
+    </div>
+   
+    <script>
+        let mediaRecorder;
+        const chunks = [];
+        const fileInput = document.getElementById('fileInput');
+        const recordButton = document.getElementById('recordButton');
+        const stopButton = document.getElementById('stopButton');
+        const translateButton = document.getElementById('translateButton');
+        const translatedText = document.getElementById('translatedText');
+        const outputAudio = document.getElementById('outputAudio');
+        const selectFileRadio = document.getElementById('selectFile');
+        const recordAudioRadio = document.getElementById('recordAudio');
+        const loaderContainer = document.getElementById('loaderContainer');
+        const targetLanguage = document.getElementById('targetLanguage');
+        loaderContainer.style.display = 'none';
+        file = null;
+
+        fileInput.addEventListener('change', () => {
+            translateButton.disabled = false;
+            // outputAudio.src = '';
+            // translatedText.value = "";
+        });
+
+        selectFileRadio.addEventListener('change', () => {
+            fileInput.removeAttribute("hidden")
+            recordButton.setAttribute("hidden", "hidden");
+            stopButton.setAttribute("hidden", "hidden");
+            // translatedText.value = "";
+            file = null;
+            translateButton.disabled = true;
+            // outputAudio.src = '';
+        });
+
+        recordAudioRadio.addEventListener('change', () => {
+            fileInput.setAttribute("hidden", "hidden");
+            recordButton.removeAttribute("hidden");
+            stopButton.removeAttribute("hidden");
+            // translatedText.value = "";
+            // outputAudio.src = '';
+            recordButton.disabled = false;
+            file = null;
+            translateButton.disabled = true;
+            fileInput.value = '';
+        });
+
+        recordButton.addEventListener('click', async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            file = null;
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    chunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/wav' });
+                file = new File([blob], 'recorded_audio.wav');
+                translateButton.disabled = false;
+            };
+
+            mediaRecorder.start();
+            recordButton.disabled = true;
+            stopButton.disabled = false;
+        });
+
+        stopButton.addEventListener('click', () => {
+            mediaRecorder.stop();
+            stopButton.disabled = true;
+            recordButton.disabled = false;
+        });
+
+        translateButton.addEventListener('click', async () => {
+            try 
+            {
+                loaderContainer.style.display = 'flex';
+                const formData = new FormData();
+
+                console.log(fileInput.files[0])
+                console.log('recordedAudio', file != null ? file : '')
+                console.log('selectedAudio', fileInput.files[0] != null ? fileInput.files[0] : '')
+
+                formData.append('selectedAudio', fileInput.files[0] != null ? fileInput.files[0] : '');
+                formData.append('recordedAudio', file != null ? file : '');
+                formData.append('targetLanguage', targetLanguage.value);
+
+                const response = await fetch('/translate', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+                console.log("data : " + data)
+
+                if(data != null)
+                {
+                    if (data.error) 
+                    {
+                        console.log(data.error)
+                        translatedText.textContent = 'Translation failed.';
+                        outputAudio.src = '';
+                    } 
+                    else 
+                    {
+                        console.log("no error")
+                        console.log(data.text)
+                        translatedText.textContent = data.text;
+                        outputAudio.src = data.audio_url;
+                    }
+                }
+
+                fileInput.value = '';
+                loaderContainer.style.display = 'none';
+                file = null;
+                translateButton.disabled = true;
+
+            } catch (error) {
+                console.error('Error:', error);
+                translatedText.textContent = 'Translation failed.';
+                outputAudio.src = '';
+                loaderContainer.style.display = 'none';
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+</body>
+</html>
