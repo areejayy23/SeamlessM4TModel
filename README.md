@@ -23,13 +23,15 @@ $ python -m venv myproject
 # Python pre 3.3
 $ virtualenv myproject
 New python executable in myproject/bin/python
-Installing setuptools, pip, wheel...done.
 
 # Activate the virtualenv (OS X & Linux)
 $ source myproject/bin/activate
 
 # Activate the virtualenv (Windows)
 $ myproject\Scripts\activate
+
+# Change the directory
+cd myproject
 ```
 You’ll need to activate your virtual environment every time you work on your Python project. In the rare cases when you want to deactivate your virtualenv without closing your terminal session, just use the `deactivate` command.
 
