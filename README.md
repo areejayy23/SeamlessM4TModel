@@ -36,9 +36,9 @@ cd myproject
 You’ll need to activate your virtual environment every time you work on your Python project. In the rare cases when you want to deactivate your virtualenv without closing your terminal session, just use the `deactivate` command.
 
 ## Install Flask
+Use pip to install the Flask
 ```
-# Use pip to install the Flask
-$ pip install Flask 
+pip install Flask 
 ```
 ## Now Clone the Repository
 ```
