@@ -1,4 +1,4 @@
-# Speech to Speech Translator Using SeamlessM4T Model
+# Translator Using SeamlessM4T Model
 
 Since the model is too big to upload on GitHub, therefore follow the below steps to run the project.
 
@@ -68,3 +68,4 @@ pip install -r requirements.txt
 ```python app.py```
 
 ## Enjoy
+### Following instructions works fine on Linux System. For installation of dependent libraries on MacOS or Windows, other steps are required to run.
