@@ -55,25 +55,36 @@ def translate():
         }
 
         target_language = s2st_target_language_codes[str(request.form['targetLanguage'])]
-        # print('request.files ' + str(request.files))
-        # print('request.form ' + str(request.form))
+        target_language2 = s2st_target_language_codes[str(request.form['targetLanguage2'])]
+        source_Language = s2st_target_language_codes[str(request.form['sourceLanguage'])]
+        inputText = str(request.form['inputText'])
+
+        task = request.form['task']
+
+        print('source_Language ' + str(source_Language))
+        print('target_language2 ' + str(target_language2))
+        print('task ' + str(task))
+        print('inputText ' + str(inputText))
 
         if 'recordedAudio' in request.files:
-            print("recordedAudio is present in files")
+            # print("recordedAudio is present in files")
             recordedAudio = request.files['recordedAudio'] 
             selectedAudio = request.form['selectedAudio']
         elif 'selectedAudio' in request.files:
-            print('selectedAudio is present in files')
+            # print('selectedAudio is present in files')
             selectedAudio = request.files['selectedAudio']
             recordedAudio = request.form['recordedAudio']
+        else :
+            selectedAudio = request.form['selectedAudio']
+            recordedAudio = request.form['recordedAudio']
 
-        return jsonify(validate_audio_file(recordedAudio, selectedAudio, target_language))
+        return jsonify(validate_audio_file(recordedAudio, selectedAudio, target_language, target_language2, source_Language, task, inputText))
 
     except Exception as e:
         return jsonify({'error': str(e)}) 
     
 
-def validate_audio_file(recordedAudio, selectedAudio, target_language):
+def validate_audio_file(recordedAudio, selectedAudio, target_language, target_language2, source_Language, task, inputText):
     try:
         output_directory = 'static'
         os.makedirs(output_directory, exist_ok=True)
@@ -82,31 +93,38 @@ def validate_audio_file(recordedAudio, selectedAudio, target_language):
         if len(str(translator)) == 0:
           translator = Translator("seamlessM4T_large", "vocoder_36langs", torch.device("cpu"), torch.float32)
 
-        if(len(str(selectedAudio)) > 0) :
-            if platform.system() == "Linux" or platform.system() == "Linux2":
-                path = '/'
-            elif platform.system() == "Windows":
-                path = 'C:'
-            for root, dir, files in os.walk(path):
-                if selectedAudio.filename in files:
-                    filePath = str(os.path.join(root, selectedAudio.filename))
+        if(task == "s2st" or task == "s2tt") :
+            if(len(str(selectedAudio)) > 0) :
+                if platform.system() == "Linux" or platform.system() == "Linux2":
+                    path = '/'
+                elif platform.system() == "Windows":
+                    path = 'C:'
+                for root, dir, files in os.walk(path):
+                    if selectedAudio.filename in files:
+                        filePath = str(os.path.join(root, selectedAudio.filename))
+            else:
+                recordedAudio.save(os.path.join(output_directory, 'recorded_audio.wav'))
+                filePath = str(os.path.join(output_directory, 'recorded_audio.wav'))
+                audio = AudioSegment.from_file(filePath)
+                audio = audio.set_frame_rate(16000)
+                audio.export(filePath, format="wav")
+
+            print("filePath " + filePath)
+            text, wav, sr = translator.predict(filePath, task, target_language)
+
+        else :
+            text, wav, sr = translator.predict(inputText, task, target_language2, src_lang=source_Language)
+        
+        if(task == "s2st" or task == "t2st") :
+            # Save the output waveform to a file
+            torchaudio.save(os.path.join(output_directory, 'output.wav'),  wav[0].cpu(),  (sr))
+            # Prepare the response
+            response = {'text': str(text), 'audio_url': 'static/output.wav'}
         else:
-            recordedAudio.save(os.path.join(output_directory, 'recorded_audio.wav'))
-            filePath = str(os.path.join(output_directory, 'recorded_audio.wav'))
-            audio = AudioSegment.from_file(filePath)
-            audio = audio.set_frame_rate(16000)
-            audio.export(filePath, format="wav")
+            response = {'text': str(text), 'audio_url': ''}
 
-        print("filePath " + filePath)
-
-        text, wav, sr = translator.predict(filePath, "s2st", target_language)
         print(text)
 
-        # Save the output waveform to a file
-        torchaudio.save(os.path.join(output_directory, 'output.wav'),  wav[0].cpu(),  (sr))
-
-        # Prepare the response
-        response = {'text': str(text), 'audio_url': 'static/output.wav'}
         return response
         
     except Exception as e:
@@ -114,4 +132,4 @@ def validate_audio_file(recordedAudio, selectedAudio, target_language):
         return {'error': str(e)}
 
 if __name__ == '__main__':
-  app.run()
+  app.run(port=8001)
