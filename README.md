@@ -42,7 +42,7 @@ pip install Flask
 ```
 ## Now Clone the Repository
 ```
-git clone https://github.com/areejayy23/SpeechTranslator.git
+https://github.com/areejayy23/SeamlessM4TModel.git
 ```
 - You can clone it anywhere on your system for now
 -  After cloning it, copy the files from the cloned folder to your Flask app folder
@@ -57,7 +57,7 @@ git clone https://github.com/areejayy23/SpeechTranslator.git
 ```
 ## Copy the Files to Your Flask App
 - Copy the repository files to your Flask App
-- Copy ** libsndfile.so.1 ** to lib folder in your Flask App
+- Copy **libsndfile.so.1** to lib folder in your Flask App
 ## Install the Dependencies
 Now open the code on any IDE or terminal and run the command to install the dependencies
 ```
@@ -65,7 +65,9 @@ pip install -r requirements.txt
 ```
 ## Run the Project
 
-```python app.py```
+```
+python app.py
+```
 
 ## Enjoy
 ### Following instructions works fine on Linux System. For installation of dependent libraries on MacOS or Windows, other steps are required to run.
